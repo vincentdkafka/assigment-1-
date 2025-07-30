@@ -3,16 +3,8 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { OverlayPanel } from 'primereact/overlaypanel';
 import 'primeicons/primeicons.css';
-
-interface Artwork {
-  id: number;
-  title: string;
-  place_of_origin: string;
-  artist_display: string;
-  inscriptions: string;
-  date_start: number;
-  date_end: number;
-}
+import { fetchArtworks } from './api';
+import type { Artwork } from './types';
 
 const App: React.FC = () => {
   const [artworks, setArtworks] = useState<Artwork[]>([]);
@@ -26,10 +18,15 @@ const App: React.FC = () => {
 
   const fetchData = async (pageNumber: number) => {
     setLoading(true);
-    const res = await fetch(`https://api.artic.edu/api/v1/artworks?page=${pageNumber + 1}`);
-    const json = await res.json();
-    setArtworks(json.data);
-    setTotalRecords(json.pagination.total);
+    try {
+      const json = await fetchArtworks(pageNumber);
+      setArtworks(json.data);
+      setTotalRecords(json.pagination.total);
+    } catch (err) {
+      // Optionally handle error
+      setArtworks([]);
+      setTotalRecords(0);
+    }
     setLoading(false);
   };
 
@@ -72,7 +69,7 @@ const App: React.FC = () => {
   return (
     <div className="p-4">
       <h2 style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-        Artworks
+         Harsh Artworks
         <button
           type="button"
           className="p-link"
