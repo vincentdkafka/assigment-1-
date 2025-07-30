@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
+import { OverlayPanel } from 'primereact/overlaypanel';
+import 'primeicons/primeicons.css';
 
 interface Artwork {
   id: number;
@@ -19,6 +21,8 @@ const App: React.FC = () => {
   const [page, setPage] = useState(0);
   const [selectedRows, setSelectedRows] = useState<{ [key: number]: Artwork }>({});
   const rowsPerPage = 10;
+  const [selectCount, setSelectCount] = useState('');
+  const overlayRef = React.useRef<any>(null);
 
   const fetchData = async (pageNumber: number) => {
     setLoading(true);
@@ -38,7 +42,7 @@ const App: React.FC = () => {
   };
 
   const onRowSelectChange = (e: any) => {
-    // e.value is the new array of selected rows
+    
     const updated: { [key: number]: Artwork } = {};
     (Array.isArray(e.value) ? e.value : [e.value]).forEach((row: Artwork) => {
       updated[row.id] = row;
@@ -46,18 +50,56 @@ const App: React.FC = () => {
     setSelectedRows(updated);
   };
 
+  const handleChevronClick = (e: React.MouseEvent) => {
+    overlayRef.current?.toggle(e);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSelectCount(e.target.value.replace(/[^0-9]/g, ''));
+  };
+
+  const handleSelectSubmit = () => {
+    const count = Math.min(Number(selectCount), artworks.length);
+    const selected: { [key: number]: Artwork } = {};
+    for (let i = 0; i < count; i++) {
+      const row = artworks[i];
+      if (row) selected[row.id] = row;
+    }
+    setSelectedRows(selected);
+    overlayRef.current?.hide();
+  };
+
   return (
     <div className="p-4">
-      <h2>Artworks</h2>
-      <div className="p-3 border-1 border-round surface-border mb-3">
-        <h4>Selected Artworks ({Object.keys(selectedRows).length})</h4>
-        <ul>
-          {Object.values(selectedRows).map(row => (
-            <li key={row.id}>{row.title}</li>
-          ))}
-        </ul>
-      </div>
-
+      <h2 style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+        Artworks
+        <button
+          type="button"
+          className="p-link"
+          style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+          onClick={handleChevronClick}
+        >
+          <span className="pi pi-chevron-down" style={{ fontSize: '1.5rem' }}></span>
+        </button>
+        <OverlayPanel ref={overlayRef} dismissable showCloseIcon>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', minWidth: 200 }}>
+            <input
+              type="text"
+              value={selectCount}
+              onChange={handleInputChange}
+              placeholder="Enter number of rows"
+              style={{ padding: '0.5rem', fontSize: '1rem' }}
+            />
+            <button
+              type="button"
+              onClick={handleSelectSubmit}
+              style={{ padding: '0.5rem', fontSize: '1rem', cursor: 'pointer' }}
+            >
+              Submit
+            </button>
+          </div>
+        </OverlayPanel>
+      </h2>
       <DataTable
         value={artworks}
         paginator
