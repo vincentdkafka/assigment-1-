@@ -1,4 +1,4 @@
-import type { Artwork, ArtworksResponse } from './types';
+import type {ArtworksResponse } from './types';
 
 export async function fetchArtworks(pageNumber: number): Promise<ArtworksResponse> {
         const res = await fetch(`https://api.artic.edu/api/v1/artworks?page=${pageNumber + 1}`);
