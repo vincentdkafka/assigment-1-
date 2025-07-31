@@ -41,6 +41,12 @@ const App: React.FC = () => {
     setIsLoading(false)
   };
 
+
+
+
+
+
+
   useEffect(() => {
     loadArtworks(currentPage)
   },    [currentPage]);
@@ -48,6 +54,11 @@ const App: React.FC = () => {
   const handlePageChange = (e: any) => {
     setCurrentPage(e.page)
   };
+
+
+
+
+
  
       const handleRowSelection = (e: any) => {
         const updatedSelection: { [id: number]: Artwork } = {};
@@ -63,10 +74,9 @@ const App: React.FC = () => {
          panelRef.current?.toggle(e);
 
 
-
-
-
        }
+
+
 
   const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.replace(/[^0-9]/g, '');
